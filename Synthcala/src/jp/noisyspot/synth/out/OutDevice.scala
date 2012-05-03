@@ -10,9 +10,9 @@ import scala.Int
  */
 trait OutDevice extends Actor {
 
-  val form: AudioFormat
-  val mixer: Option[Mixer.Info]
-  val bytesConverter: (Double) => Seq[Byte]
+  def form: AudioFormat
+  def mixer: Option[Mixer.Info]
+  def bytesConverter: (Double) => Seq[Byte]
 
   /**サウンドデバイスへのデータラインを取得 */
   val line = mixer match {
@@ -26,18 +26,18 @@ trait OutDevice extends Actor {
    * OutDevice.Flushを受診した場合は、データラインをflushする。
    * OutDevice.Endを受診した場合は、戻り値"OK"を返しスレッドを終了する。
    */
-  def act() = {
+  def act() {
     line.open(form)
-    line.start
+    line.start()
     loop {
       react {
         case frame: Seq[Double] => output(frame)
         case OutDevice.Flush => line.flush()
         case OutDevice.End => {
-          line.stop
-          line.close
+          line.stop()
+          line.close()
           reply("OK")
-          exit
+          exit()
         }
       }
     }
@@ -62,16 +62,16 @@ trait OutDevice extends Actor {
 
 /**
  * 16bitサウンドデバイス用のOutDevice実装クラス
- * @param frameRate
- * @param channels
- * @param mixer
+ * @param frameRate フレームレート
+ * @param channels チャネル数（モノラル：1 / ステレオ：2)
+ * @param theMixer 使用デバイスを指定するMixer.infoオブジェクト。デフォルトデバイスを使用する場合は Noneを指定する。
  */
 class OutDevice16bit(val frameRate: Double,
                      val channels: Int,
-                     override val mixer: Option[Mixer.Info]) extends OutDevice {
+                     val theMixer: Option[Mixer.Info]) extends OutDevice {
 
-  override val form = new AudioFormat(frameRate.toFloat, 16, channels, true, false)
-  override val bytesConverter = (sample: Double) => {
+  override def form = new AudioFormat(frameRate.toFloat, 16, channels, true, false)
+  override def bytesConverter = (sample: Double) => {
     // 符号付き16bitのバイト列に変換
     val intVal = (sample * (if (sample < 0.0) 32768.0 else 32767.0)).toInt
     List(
@@ -79,6 +79,7 @@ class OutDevice16bit(val frameRate: Double,
       (intVal >> 8).toByte
     )
   }
+  override def mixer = theMixer
 }
 
 /**OutDeviceのコンパニオンオブジェクト。また、メッセージの型を定義します。 */
