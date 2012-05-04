@@ -82,7 +82,7 @@ class OutDevice16bit(val frameRate: Double,
   override def mixer = theMixer
 }
 
-/**OutDeviceのコンパニオンオブジェクト。また、メッセージの型を定義します。 */
+/**OutDeviceのコンパニオンオブジェクト。メッセージの型を定義します。 */
 object OutDevice {
 
   /**オーディオデバイスのDataLineにバッファフラッシュさせるメッセージ */
