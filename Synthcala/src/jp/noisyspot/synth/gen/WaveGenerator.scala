@@ -5,21 +5,20 @@ package jp.noisyspot.synth.gen
  */
 object WaveGenerator {
 
-  def toStreamMono(f: (BigInt) => Double): (BigInt, BigInt) => Stream[Double] = {(from, to) => {
-    def iter(z: BigInt): Stream[Double] = {
-      if (z > to) Stream.empty else f(z) #:: iter(z + 1)
-    }
-    iter(from)
-  }}
+  def pan(panpot: Double) = (x: Double) => {
+    require(panpot >= 0.0 && panpot <= 1.0)
+    List(x * (1.0 - panpot), x * panpot)
+  }
 
-  def squareWave(sampleRate: Double, dutyRate: Double, volume: Double, tone: Double, z: BigInt) : Double = {
+  def squareWave(sampleRate: Double, dutyRate: Double, volume: Double, tone: Double) = (z: Int) => {
     val waveLen = sampleRate / tone
     if (z.toDouble % waveLen <= waveLen * dutyRate) volume else -volume
   }
 
-  def sineWave(sampleRate: Double, volume: Double, tone: Double, z: BigInt) : Double = {
+  def sineWave(sampleRate: Double, volume: Double, tone: Double) = (z: Int) => {
     import scala.math._
     val n = z.toDouble / (sampleRate / tone)
     sin((n - n.floor) * 2.0 * Pi)
   }
+
 }
