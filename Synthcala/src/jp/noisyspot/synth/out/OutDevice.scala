@@ -74,10 +74,7 @@ class OutDevice16bit(val frameRate: Double,
   override def bytesConverter = (sample: Double) => {
     // 符号付き16bitのバイト列に変換
     val intVal = (sample * (if (sample < 0.0) 32768.0 else 32767.0)).toInt
-    List(
-      (intVal & 0xff).toByte,
-      (intVal >> 8).toByte
-    )
+    List((intVal & 0xff).toByte, (intVal >> 8).toByte)
   }
   override def mixer = theMixer
 }
