@@ -8,15 +8,6 @@ package jp.noisyspot.synth.sequence
 case class RealTime(sec: Int, frame: Int)
 
 /**
- * イベントの譜面上のタイミング
- * @param bar   小節
- * @param clock 小節内のクロック（クロック解像度は四分音符あたり48とする）
- */
-case class EventTime(bar: Int, clock: Int) {
-  def gap(b: EventTime, clocksPerBar: Int) = (b.bar - this.bar) * clocksPerBar + (b.clock - this.clock)
-}
-
-/**
  * イベントリスト内の演奏状態保持クラス
  * @param tempo         テンポ
  * @param clocksPerBar  小節あたりの総クロック数（拍子によって変化する）
@@ -42,11 +33,12 @@ class EventList(val list: Seq[Event], val sampleRate: Double) {
 
   /** 実時間にマップされたイベントリストを返す */
   def eventMap = {
-    def iter(curList: Seq[Event], state: SectionState, cont: Seq[(RealTime, Event)]) : Map[RealTime, Event] = {
+    def iter(curList: Seq[Event], state: SectionState, cont: List[(RealTime, Event)]) : Map[RealTime, Event] = {
       curList match {
         case h :: t => {
           val (preTime, preEvent) = cont.head
-          val n = (h.time.gap(preEvent.time) * state.framesPerClock(sampleRate)).round.toInt + preTime.frame
+          val n = (h.time.gap(preEvent.time, state.clocksPerBar) * state.framesPerClock(sampleRate)).round.toInt +
+            preTime.frame
           val next = (RealTime(preTime.sec + n / sampleRate.toInt, n % sampleRate.toInt), h)
           val nextState = h match {
             case TempoChange(_, tempo) => state.tempoChange(tempo)
@@ -60,7 +52,7 @@ class EventList(val list: Seq[Event], val sampleRate: Double) {
       }
     }
 
-    iter(list, INITIAL_STATE, Seq.empty)
+    iter(list, INITIAL_STATE, List.empty)
   }
 
 }
