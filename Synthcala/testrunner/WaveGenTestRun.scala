@@ -1,5 +1,5 @@
 import jp.noisyspot.synth.gen.WaveGenerator._
-import jp.noisyspot.synth.out.{OutDevice, DefaultOutDevice}
+import jp.noisyspot.synth.out.{OutDevice, PlayDevice}
 import jp.noisyspot.synth.SoundSystemConsts._
 
 object WaveGenTestRun {
@@ -18,7 +18,7 @@ object WaveGenTestRun {
     val end = 2 * FRAMES_PAR_SEC.toInt
 
     // サウンドデバイス
-    val device = DefaultOutDevice()
+    val device = PlayDevice.default()
 
     device.start()
     device ! Range(0, end).flatMap(sqConc)

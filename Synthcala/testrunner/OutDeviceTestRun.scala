@@ -1,6 +1,5 @@
-import jp.noisyspot.synth.out.{OutDevice, DefaultOutDevice}
+import jp.noisyspot.synth.out.{PlayDevice, OutDevice}
 import jp.noisyspot.synth.SoundSystemConsts._
-import reflect.Literal
 
 object OutDeviceTestRun {
   def main(args: Array[String]) {
@@ -10,7 +9,7 @@ object OutDeviceTestRun {
     val DT = 1.0 / FRAMES_PAR_SEC
     val OUT_TIME_SEC = 2.0
 
-    val device = DefaultOutDevice()
+    val device = PlayDevice.default()
     device.start()
 
     def waveIter(t: Double, p: Double, level: Double, cont: List[Double]): List[Double] = {
