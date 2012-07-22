@@ -1,10 +1,17 @@
+import java.io.File
 import jp.noisyspot.synth.gen.WaveGenerator._
-import jp.noisyspot.synth.out.{OutDevice, PlayDevice}
+import jp.noisyspot.synth.out.{AudioFileDevice, OutDevice, PlayDevice}
 import jp.noisyspot.synth.SoundSystemConsts._
 
 object WaveGenTestRun {
   def main(args: Array[String]) {
 
+    waveGen(PlayDevice.default())
+    waveGen(AudioFileDevice.default(new File("C:/temp/hoge.wav")))
+
+  }
+
+  def waveGen(device: OutDevice) {
     // デューティ比0.8、音程440Hz、音量0.2、定位0.5 (中央) の矩形波関数
     val sqConc = squareWave(FRAMES_PAR_SEC, 0.8, 440.0) andThen vol(0.2) andThen pan(0.5)
 
@@ -16,9 +23,6 @@ object WaveGenTestRun {
 
     // 発声時間（2秒)
     val end = 2 * FRAMES_PAR_SEC.toInt
-
-    // サウンドデバイス
-    val device = PlayDevice.default()
 
     device.start()
     device ! Range(0, end).flatMap(sqConc)
