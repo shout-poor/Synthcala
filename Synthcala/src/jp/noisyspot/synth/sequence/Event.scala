@@ -2,18 +2,19 @@ package jp.noisyspot.synth.sequence
 
 /**
  * イベントの譜面上のタイミング
- * @param bar   小節
- * @param clock 小節内のクロック（クロック解像度は四分音符あたり48とする）
  */
-case class EventTime(bar: Int, clock: Int) {
-  def gap(b: EventTime, clocksPerBar: Int) = (b.bar - this.bar) * clocksPerBar + (b.clock - this.clock)
-}
+case class EventTime(bar: Int, clock: Int)
 
 /**
  * イベントtrait
  */
 sealed trait Event {
   def time: EventTime
+}
+
+/** Start of sequence */
+case class StartEvent() extends Event {
+  def time = EventTime(0, 0)
 }
 
 /** Note on event*/
